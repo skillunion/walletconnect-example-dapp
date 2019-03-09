@@ -490,6 +490,52 @@ class App extends React.Component<any, any> {
   //   }
   // };
 
+  public testLoadDapplet = async () => {
+    const { walletConnector, address } = this.state;
+
+    if (!walletConnector) {
+      return;
+    }
+    
+    try {
+      // open modal
+      this.toggleModal();
+
+      // toggle pending request indicator
+      this.setState({ pendingRequest: true });
+
+      const metadata = {
+        customParam1: 'test1',
+        customParam2: 'test2',
+        customParam3: 'test3'
+      };
+
+      // send transaction
+      const result = await walletConnector.loadDapplet(metadata);
+
+      console.log('!!!!! result', result); // tslint:disable-line
+
+      // format displayed result
+      const formattedResult = {
+        method: "wallet_loadDapplet",
+        txHash: result,
+        from: address,
+        to: address,
+        value: "0 ETH"
+      };
+
+      // display result
+      this.setState({
+        walletConnector,
+        pendingRequest: false,
+        result: formattedResult || null
+      });
+    } catch (error) {
+      console.error(error); // tslint:disable-line
+      this.setState({ walletConnector, pendingRequest: false, result: null });
+    }
+  };
+
   public render = () => {
     const {
       assets,
@@ -548,6 +594,10 @@ class App extends React.Component<any, any> {
                       // onClick={this.testSignTypedData}
                     >
                       {"Sign Test Typed Data"}
+                    </STestButton>
+
+                    <STestButton left onClick={this.testLoadDapplet}>
+                      {"Load Test Dapplet"}
                     </STestButton>
                   </STestButtonContainer>
                 </Column>
